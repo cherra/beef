@@ -1,0 +1,24 @@
+.fila-alterna{
+    background: #ffe9e9;
+}
+
+.tabla-listado.tabla-seleccionable tr:hover{
+    cursor: pointer;
+    background-color: #ff8e8e;
+    color: #ffffff;
+}
+
+/* error message for validator*/
+.error{
+    background-color: #ffe9e9;
+}
+
+.ui-spinner-input{
+    margin-right: 2px !important;
+}
+
+.fila-seleccionada{
+    font-weight: bold;
+    background: #004276;
+    color: #eee;
+}
