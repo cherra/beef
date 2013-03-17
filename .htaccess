@@ -1,6 +1,6 @@
 RewriteEngine on
 Options +FollowSymlinks
-RewriteBase /~cherra/intranet2.0
+RewriteBase /~cherra/beef
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule .* index.php/$0 [PT,L] 
