@@ -35,10 +35,14 @@ class Pedidos extends CI_Controller{
     }
     
     public function cancela( $id_pedido ){
-        if($id_pedido > 0){
-            $this->pedido->cancela($id_pedido);
+        if($this->input->is_ajax_request()){
+            if($datos = $this->input->post()){
+                if($datos['id_pedido'] > 0){
+                    $resultado = $this->pedido->cancela($datos['id_pedido']);
+                    echo $resultado;
+                }
+            }
         }
-        $this->listado();
     }
 }
 

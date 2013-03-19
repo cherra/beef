@@ -1,5 +1,5 @@
 <div id="contenido">
-    <?php echo form_open('ingresos/pedidos/listado'); ?>
+    <?php echo form_open('ingresos/pedidos/listado', array('id' => 'busqueda')); ?>
     <table class="tabla-filtros">
         <tr class="ui-widget-header">
             <td colspan="2" class="filtro-titulo">Filtros de búsqueda</td>
@@ -11,6 +11,12 @@
         <tr>
             <td class="filtro-nombre">Cliente:</td>
             <td class="filtro-dato"><input type="text" name="nombre" value="<?php echo isset($filtros['nombre']) ? $filtros['nombre'] : ''; ?>" /></td>
+        </tr>
+        <tr>
+            <td class="filtro-nombre">Ocultar cancelados:</td>
+            <td class="filtro-dato">
+                <input type="checkbox" name="cancelado" id="cancelado" value="n" <?php echo isset($filtros['cancelado']) ? 'checked' : ''; ?>/>
+            </td>
         </tr>
        
         <tr>
@@ -31,7 +37,7 @@
         <?php
             foreach ($pedidos as $pedido){
         ?>
-        <tr>
+        <tr <?php if($pedido->cancelado == 's') echo 'class="ui-state-disabled"'; ?>>
             <td><?php echo $pedido->id_pedido; ?></td>
             <td><?php echo $pedido->nombre; ?></td>
             <td><?php echo $pedido->fecha; ?></td>
@@ -39,10 +45,12 @@
             <td><?php echo $pedido->id_venta; ?></td>
             <td>
                 <?php
-                if(strlen($pedido->id_venta) == 0){
+                if(strlen($pedido->id_venta) == 0 && $pedido->cancelado == 'n'){
                 ?>
                 <a href="#" tipo="cancela" id_pedido="<?php echo $pedido->id_pedido; ?>">Cancelar</a>
                 <?php
+                }elseif ($pedido->cancelado == 's'){
+                    echo "cancelado";
                 }
                 ?>
             </td>
@@ -57,10 +65,22 @@
     $(document).ready(function(){
         $('a[tipo="cancela"]').click(function(){
             var confirmar;
-            //alert("Seguro que deseas cancelar el pedido ?");
             confirmar = confirm("Seguro que deseas cancelar el pedido "+$(this).attr('id_pedido')+"?");
             if(confirmar){
-                window.location.assign("<?php echo base_url().'ingresos/pedidos/cancela/'; ?>"+$(this).attr('id_pedido'));
+                loader = new ajaxLoader($('#contenido'));
+                $.ajax({
+                    url: "<?php echo base_url().'ingresos/pedidos/cancela'; ?>",
+                    type: 'post',
+                    data: {'id_pedido': $(this).attr('id_pedido')},
+                    dataType: 'text'
+                }).done(function(pedido){
+                    if(Number(pedido) >= 1)
+                        alert('Pedido cancelado con éxito!');
+                    $('#busqueda').submit();
+                }).fail(function(){
+                    alert("Error al cancelar el pedido! URL: <?php echo current_url(); ?>");
+                    loader.remove();
+                });
             }
         });
     });

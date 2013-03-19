@@ -61,6 +61,7 @@ class Pedido extends CI_Model{
     public function cancela($id_pedido){
         $this->db->where('id_pedido', $id_pedido);
         $this->db->update('Pedido', array('cancelado' => 's'));
+        return $this->db->affected_rows();
     }
     
     public function get_por_id($id_pedido){
