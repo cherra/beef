@@ -28,3 +28,8 @@
     overflow-y: auto; 
     margin-bottom: 10px;
 }
+
+.small-title{
+    color: #003399;
+    /*font-size: small;*/
+}
