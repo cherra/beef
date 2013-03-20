@@ -18,7 +18,7 @@
         </tr>
     </table>
     <?php echo form_close(); ?>
-    <div style="margin-left: auto; margin-right: 1px;">Haz click sobre el vendedor para ver sus clientes asignado o asignarle nuevos.</div>
+    <div style="margin-left: auto; margin-right: 1px;" class="small-title">Haz click sobre el vendedor para ver sus clientes asignado o asignarle nuevos.</div>
     <div class="ui-widget-content box-list">
         <table id="vendedores" class="tabla-listado tabla-seleccionable">
 
