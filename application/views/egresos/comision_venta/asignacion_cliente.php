@@ -19,12 +19,13 @@
     </table>
     <?php echo form_close(); ?>
     <div style="margin-left: auto; margin-right: 1px;">Haz click sobre el vendedor para ver sus clientes asignado o asignarle nuevos.</div>
-        <div class="ui-widget-content box-list">
-            <table id="vendedores" class="tabla-listado tabla-seleccionable">
+    <div class="ui-widget-content box-list">
+        <table id="vendedores" class="tabla-listado tabla-seleccionable">
 
-            </table>
-            <input type="hidden" id="id_vendedor" value=""/>
-        </div>
+        </table>
+        <input type="hidden" id="id_vendedor" value=""/>
+    </div>
+    
     <?php echo form_open('',array('class'=>'ajax','id'=>'form_busqueda_clientes_asignados')); ?>
     <table class="tabla-filtros">
         <tr class="ui-widget-header">
@@ -45,7 +46,7 @@
     </table>
     <?php echo form_close(); ?>
     
-    <div style="margin-left: auto; margin-right: 1px; margin-top: 10px;">Clientes asignados. (Haz click sobre algún cliente para quitar la asignación al vendedor)</div>
+    <div style="margin-left: auto; margin-right: 1px; margin-top: 10px;" class="small-title">Clientes asignados. (Haz click sobre algún cliente para quitar la asignación al vendedor o modificar la fecha)</div>
     <div class="ui-widget-content box-list">
         <table id="clientes_asignados" class="tabla-listado tabla-seleccionable">
 
@@ -53,13 +54,55 @@
         <input type="hidden" id="id_cliente_asignado" value="" />
     </div>
     <?php echo form_open('',array('class'=>'ajax','id'=>'form_cliente_asignado')); ?>
-    <table class="tabla-captura" id="tabla_modificar_cliente" style="display: none;">
+    <table class="tabla-captura" id="tabla_modificar_cliente">
         <tr>
             <td style="width: 30%;"><label for="fecha_asignada">Fecha de asignación: </label></td>
             <td style="width: 30%;"><input type="text" class="fecha" name="fecha_asignada" id="fecha_asignada" required="required"/></td>
             <td style="width: 40%;">
                 <input type="hidden" id="id_comision" name="id_comision" />
                 <input type="submit" value="Cambiar"/>
+                <input type="button" id="quitar" value="Quitar"/>
+            </td>
+        </tr>
+    </table>
+    <?php echo form_close(); ?>
+    
+    <div style="margin-top: 10px;">
+        <?php echo form_open('',array('class'=>'ajax','id'=>'form_busqueda_clientes')); ?>
+        <table class="tabla-filtros">
+            <tr class="ui-widget-header">
+                <td colspan="2" class="filtro-titulo">Filtros de busqueda de clientes</td>
+            </tr>
+            <tr>
+                <td class="filtro-nombre">Cliente</td>
+                <td class="filtro-dato">
+                    <input type="text" name="cliente" id="cliente" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="hidden" name="bloqueado" value="n" />
+                    <input type="submit" value="Buscar" />
+                </td>
+            </tr>
+        </table>
+        <?php echo form_close(); ?>
+    </div>
+    
+    <div style="margin-left: auto; margin-right: 1px; margin-top: 10px;" class="small-title">Clientes. (Haz click sobre algún cliente para asignarlo al vendedor)</div>
+    <div class="ui-widget-content box-list">
+        <table id="clientes" class="tabla-listado tabla-seleccionable">
+
+        </table>
+        <input type="hidden" id="id_cliente" value="" />
+    </div>
+    <?php echo form_open('',array('class'=>'ajax','id'=>'form_cliente')); ?>
+    <table class="tabla-captura" id="tabla_asignar_cliente">
+        <tr>
+            <td style="width: 30%;"><label for="fecha_asignacion">Fecha de asignación: </label></td>
+            <td style="width: 30%;"><input type="text" class="fecha" name="fecha_asignacion" id="fecha_asignacion" required="required"/></td>
+            <td style="width: 40%;">
+                <input type="submit" value="Asignar"/>
             </td>
         </tr>
     </table>
@@ -99,7 +142,7 @@
             });
         }
         
-        function get_clientes(){
+        function get_clientes_asignados(){
             var datos = "";
             var loader;
             loader = new ajaxLoader($('#contenido'));
@@ -110,7 +153,7 @@
                 data: {id_vendedor: $("#id_vendedor").val(), nombre_cliente: $("#nombre_cliente").val()},
                 dataType: 'json'
             }).done(function(clientes){
-                $('#tabla_modificar_cliente').css('display','none');
+                //$('#tabla_modificar_cliente').css('display','none');
                 //alert(clientes);
                 $('#clientes_asignados').html('<tr class="ui-widget-header">'+
                 '<td style="width: 10%; text-align: center;">Número</td>'+
@@ -132,6 +175,41 @@
             });
         }
         
+        function get_clientes(){
+            var datos = "";
+            var loader;
+            loader = new ajaxLoader($('#contenido'));
+                
+            $.ajax({
+                url: "<?php echo base_url().'egresos/comisiones_ventas/get_clientes'; ?>",
+                type: 'post',
+                data: {nombre_cliente: $("#cliente").val()},
+                dataType: 'json'
+            }).done(function(clientes){
+                //alert(clientes);
+                //$('#tabla_asignar_cliente').css('display','none');
+                $('#clientes').html('<tr class="ui-widget-header">'+
+                '<td style="width: 10%; text-align: center;">Número</td>'+
+                '<td style="width: 40%; text-align: center;">Nombre</td>'+
+                '<td style="width: 30%; text-align: center;">Asignado a</td>'+
+                '<td style="width: 20%; text-align: center;">Fecha asignacion</td>'+
+                '</tr>');
+                $.each(clientes,function(key,val){
+                    datos += '<tr id_empleado="'+val.id_empleado+'" id_cliente="'+val.id_cliente+'" id_comision="'+val.id_comision+'" fecha="'+val.fecha+'" >'+
+                                            '<td align="left">'+val.id_cliente+'</td>'+
+                                            '<td align="left">'+val.nombre+'</td>'+
+                                            '<td align="left">'+val.nombre_empleado+'</td>'+
+                                            '<td align="left">'+val.fecha+'</td></tr>';
+                });
+                $('#clientes').append(datos);
+                aplica_estilo_listado();
+                loader.remove();
+            }).fail(function(){
+                alert("Error al obtener los clientes! URL: <?php echo current_url(); ?>");
+                loader.remove();
+            });
+        }
+        
         $('#form_busqueda').validate({
             submitHandler: function(form){
                 get_vendedores();
@@ -143,6 +221,7 @@
             
             $('#vendedores tr[class!="ui-widget-header"]').removeClass('fila-seleccionada');
             $(this).addClass('fila-seleccionada');
+            get_clientes_asignados();
             get_clientes();
         });
         
@@ -158,7 +237,7 @@
         
         $('#form_busqueda_clientes_asignados').validate({
             submitHandler: function(form){
-                get_clientes();
+                get_clientes_asignados();
             }
         });
         
@@ -177,8 +256,7 @@
                         dataType: 'json'
                     }).done(function(respuesta){
                         if(respuesta > 0){
-                            alert("Fecha actualizada con éxito!");
-                            get_clientes();
+                            get_clientes_asignados();
                         }else{
                             alert("Ocurrió un error al actualizar la fecha!")
                         }
@@ -186,6 +264,79 @@
 
                     }).fail(function(){
                             alert("Error al actualizar la fecha de asignación! URL: <?php echo current_url(); ?>");
+                    });
+                }
+            }
+        });
+        
+        $('#quitar').click(function(){
+            var cambiar = confirm("Estas seguro(a) que quieres quitar al cliente?");
+            if(cambiar){
+                var loader;
+                loader = new ajaxLoader($('#contenido'));
+
+                $.ajax({
+                    url: "<?php echo base_url().'egresos/comisiones_ventas/quitar_cliente'; ?>",
+                    type: 'post',
+                    data: {id_cliente: $('#id_cliente_asignado').val()},
+                    dataType: 'json'
+                }).done(function(respuesta){
+                    if(respuesta > 0){
+                        get_clientes_asignados();
+                        get_clientes();
+                    }else{
+                        alert("Ocurrió un error al quitar al cliente!")
+                    }
+                    loader.remove();
+
+                }).fail(function(){
+                        alert("Error al quitar el cliente! URL: <?php echo current_url(); ?>");
+                });
+            }
+        });
+        
+        // Para los clientes no asignados
+        
+        $('#clientes').on('click','tr[class!="ui-widget-header"]',function(){
+            $('#id_cliente').val($(this).attr('id_cliente'));
+            
+            $('#clientes tr[class!="ui-widget-header"]').removeClass('fila-seleccionada');
+            $(this).addClass('fila-seleccionada');
+            $('#fecha_asignacion').val($(this).attr('fecha'));
+            //$('#id_comision').val($(this).attr('id_comision'));
+            $('#tabla_asignar_cliente').css('display','block');
+        });
+        
+        $('#form_busqueda_clientes').validate({
+            submitHandler: function(form){
+                get_clientes();
+            }
+        });
+        
+        $('#form_cliente').validate({
+            submitHandler: function(form){
+                var cambiar = confirm("Estas seguro(a) que deseas asignar este cliente?");
+                if(cambiar){
+                    var loader;
+                    var datos = '';
+                    loader = new ajaxLoader($('#contenido'));
+
+                    $.ajax({
+                        url: "<?php echo base_url().'egresos/comisiones_ventas/asignar_cliente'; ?>",
+                        type: 'post',
+                        data: {fecha: $('#fecha_asignacion').val(), id_cliente: $('#id_cliente').val(), id_empleado: $('#id_vendedor').val()},
+                        dataType: 'text'
+                    }).done(function(respuesta){
+                        if(respuesta > 0){
+                            get_clientes_asignados();
+                            get_clientes();
+                        }else{
+                            alert("Ocurrió un error al asignar el cliente!")
+                        }
+                        loader.remove();
+
+                    }).fail(function(){
+                            alert("Error al asignar al cliente! URL: <?php echo current_url(); ?>");
                     });
                 }
             }

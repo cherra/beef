@@ -37,7 +37,6 @@ class Comisiones_ventas extends CI_Controller {
     public function get_clientes_asignados(){
         if($this->input->is_ajax_request()){
             if($datos_busqueda = $this->input->post()){
-                $this->load->model('egresos/comision_venta');
                 $clientes = $this->comision_venta->get_clientes_asignados( $datos_busqueda );
                 echo json_encode($clientes, JSON_FORCE_OBJECT);
             }
@@ -47,8 +46,34 @@ class Comisiones_ventas extends CI_Controller {
     public function update_fecha_asignacion(){
         if($this->input->is_ajax_request()){
             if($datos = $this->input->post()){
-                $this->load->model('egresos/comision_venta');
                 $resultado = $this->comision_venta->update_fecha_asignacion( $datos['id_comision'], $datos['fecha'] );
+                echo $resultado;
+            }
+        }
+    }
+    
+    public function get_clientes(){
+        if($this->input->is_ajax_request()){
+            if($datos_busqueda = $this->input->post()){
+                $clientes = $this->comision_venta->get_clientes( $datos_busqueda );
+                echo json_encode($clientes, JSON_FORCE_OBJECT);
+            }
+        }
+    }
+    
+    public function asignar_cliente(){
+        if($this->input->is_ajax_request()){
+            if($datos = $this->input->post()){
+                $resultado = $this->comision_venta->asignar_cliente( $datos['id_cliente'], $datos['id_empleado'], $datos['fecha'] );
+                echo $resultado;
+            }
+        }
+    }
+    
+    public function quitar_cliente(){
+        if($this->input->is_ajax_request()){
+            if($datos = $this->input->post()){
+                $resultado = $this->comision_venta->quitar_cliente( $datos['id_cliente'] );
                 echo $resultado;
             }
         }
